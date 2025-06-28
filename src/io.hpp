@@ -12,6 +12,7 @@ class Io{
     public:
         string getFacOutputFileName(const int &argc, char **argv);
         string getGenOutputFileName(const int &argc, char **argv);
+        string getInputFileName(const int &argc, char **argv);
         int getSolutionId(const int &argc, char **argv);
 };
 

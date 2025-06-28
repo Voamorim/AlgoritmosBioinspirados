@@ -31,6 +31,15 @@ string Io::getGenOutputFileName(const int &argc, char **argv){
     return gen_output_file_name;
 }
 
+string Io::getInputFileName(const int &argc, char **argv){
+    string flag = "-i";
+    string input_file_name = getFileName(argc, argv, flag);
+    if(input_file_name == "")
+        input_file_name = "sgb128_dist.txt";
+    input_file_name = "../inputs/" + input_file_name;
+    return input_file_name;
+}
+
 int Io::getId(const int &argc, char **argv, const string &flag){
     for(int i = 1; i < argc; i+=2){
         if(not strcmp(argv[i], flag.c_str())){

@@ -10,13 +10,15 @@ using namespace std;
 int main(int argc, char **argv){ _
 	Io *io = new Io();
 
+	ifstream input_file(io->getInputFileName(argc, argv));
+
 	int solution_id = io->getSolutionId(argc, argv);
 
 	Solve solve;
 
 	switch(solution_id){
 		case 1:{
-			solve.solve();
+			solve.solve(input_file);
 			break;
 		}
 		case 2:{
@@ -28,7 +30,7 @@ int main(int argc, char **argv){ _
 				return 1;
 			}
 
-			solve.generationsTest(gen_output_file);
+			solve.generationsTest(input_file, gen_output_file);
 			break;
 		}
 		case 3:{
@@ -39,7 +41,7 @@ int main(int argc, char **argv){ _
 				return 1;
 			}
 
-			solve.factorialTest(fac_output_file);
+			solve.factorialTest(input_file, fac_output_file);
 			break;
 		}
 	};
