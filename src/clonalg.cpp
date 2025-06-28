@@ -62,6 +62,8 @@ void Clonalg::evaluateIndividual(pair<vector<uint>, double> &indv){
 
     uint n = graph->getNumVertices();
     for (uint i = 0, j = 1; i < n; ++i, j = (j + 1) % n){
+        //if(indv.first[i] > 128 or indv.first[j] > 128)
+        //    dbg(indv.first[i]), dbg(indv.first[j]), dbg(i), dbg(j);
         indv.second += graph->getEdge(indv.first[i], indv.first[j]);
     }
 }
@@ -125,7 +127,7 @@ void Clonalg::hypermutation(vector<pair<vector<uint>, double>> &clones){
 
             // Caso o valor sorteado seja menor que a probabilidade de mutação
             if(r <= alpha){
-                uniform_int_distribution<> swap_dis(0, clone.first.size());
+                uniform_int_distribution<> swap_dis(0, clone.first.size() - 1);
                 
                 uint swap_idx;
                 do{
