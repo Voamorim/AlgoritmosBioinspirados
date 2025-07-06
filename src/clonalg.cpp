@@ -4,10 +4,10 @@ mt19937 globalGenerator(random_device{}());
 
 #define dbg(x) cout << #x << " == " << x << endl
 
-Clonalg::Clonalg(const Graph *_graph, uint _npop, uint _nclones, 
-                 uint _ngen, uint _d, double _beta, double _rho) : 
-    graph(_graph), population(_npop), fitness(_npop), memory(_nclones), 
-    npop(_npop), nclones(_nclones), ngen(_ngen), d(_d), beta(_beta), 
+Clonalg::Clonalg(const Graph *_graph, uint _npop, uint _nclones,
+                 uint _ngen, uint _d, double _beta, double _rho) :
+    graph(_graph), population(_npop), fitness(_npop), memory(_nclones),
+    npop(_npop), nclones(_nclones), ngen(_ngen), d(_d), beta(_beta),
     rho(_rho) {}
 
 Clonalg::~Clonalg() {}
@@ -17,8 +17,55 @@ uint Clonalg::getStartingVertex(void){
     return dis(globalGenerator);
 }
 
+void Clonalg::createInitialPopulation(uint strategy_id){
+    switch (strategy_id){
+        case 1: {
+            createRandomInitialPopulation();
+            break;
+        }
+        case 2:{
+            createGreedyInitialPopulation();
+            break;
+        }
+    }
+}
+
+void Clonalg::createRandomInitialPopulation(){
+    for(uint i = 0; i < npop; ++i){
+        fitness[i].second = i;
+
+        uint src = getStartingVertex();
+
+        population[i].first.push_back(src);
+        population[i].second = 0.0;
+
+        uint n = graph->getNumVertices();
+
+        set<uint> visited_vertices;
+        visited_vertices.insert(src);
+
+        uniform_int_distribution<> dis(0, n - 1);
+        while(visited_vertices.size() != n){
+            uint u;
+
+            do{
+                u = dis(globalGenerator);
+            } while(visited_vertices.find(u) != visited_vertices.end());
+
+            population[i].first.push_back(u);
+            population[i].second += graph->getEdge(src, u);
+
+            src = u;
+            visited_vertices.insert(u);
+        }
+        population[i].second += graph->getEdge(population[i].first[n-1],
+                                               population[i].first[0]);
+        population[i].first.push_back(population[i].first[0]);
+    }
+}
+
 // Cria população inicial com heurística gulosa
-void Clonalg::createInitialPopulation(){
+void Clonalg::createGreedyInitialPopulation(){
     for(uint i = 0; i < npop; ++i){
         fitness[i].second = i;
 
@@ -40,7 +87,7 @@ void Clonalg::createInitialPopulation(){
                     continue;
 
                 double cost = graph->getEdge(src, j);
-                if (cost < min_cost.first and 
+                if (cost < min_cost.first and
                     visited_vertices.find(j) == visited_vertices.end())
                     min_cost = make_pair(cost, j);
             }
@@ -51,10 +98,10 @@ void Clonalg::createInitialPopulation(){
             src = min_cost.second;
             visited_vertices.insert(src);
         }
-        population[i].second += graph->getEdge(population[i].first[n-1], 
+        population[i].second += graph->getEdge(population[i].first[n-1],
                                                population[i].first[0]);
-        population[i].first.push_back(population[i].first[0]); 
-    }    
+        population[i].first.push_back(population[i].first[0]);
+    }
 }
 
 void Clonalg::evaluateIndividual(pair<vector<uint>, double> &indv){
@@ -70,7 +117,7 @@ void Clonalg::evaluateIndividual(pair<vector<uint>, double> &indv){
 
 void Clonalg::evaluatePopulation(void){
     for(uint i = 0; i < npop; ++i){
-        auto& indv = population[fitness[i].second]; 
+        auto& indv = population[fitness[i].second];
 
         evaluateIndividual(indv);
 
@@ -87,7 +134,7 @@ vector<pair<vector<uint>, double>> Clonalg::createClones(void){
     uint i = 0;
     while(i < nclones){
         uint nclones_idv = (beta * npop)/(i + 1);
-        
+
         auto idv = population[fitness[i].second];
         for(uint j = 0; j < nclones_idv; ++j){
             clones.push_back(idv);
@@ -100,8 +147,8 @@ vector<pair<vector<uint>, double>> Clonalg::createClones(void){
 
 void Clonalg::hypermutation(vector<pair<vector<uint>, double>> &clones){
     auto clones_fitness = evaluateClones(clones);
-   
-    auto it = max_element(clones_fitness.begin(), clones_fitness.end(), 
+
+    auto it = max_element(clones_fitness.begin(), clones_fitness.end(),
                           [](const auto& a , const auto& b){
         return a.second < b.second;
     });
@@ -128,7 +175,7 @@ void Clonalg::hypermutation(vector<pair<vector<uint>, double>> &clones){
             // Caso o valor sorteado seja menor que a probabilidade de mutação
             if(r <= alpha){
                 uniform_int_distribution<> swap_dis(0, clone.first.size() - 1);
-                
+
                 uint swap_idx;
                 do{
                     swap_idx = swap_dis(globalGenerator);
@@ -178,13 +225,13 @@ void Clonalg::applyDiversity(void){
 
         set<uint> inserted_vertices;
         inserted_vertices.insert(src);
-       
+
         indv.first[0] = src;
         indv.second = 0.0;
 
-        for(uint j = 1; j < n; ++j){ 
+        for(uint j = 1; j < n; ++j){
             uniform_int_distribution<> v_dis(0, n-1);
-            
+
             uint new_v;
             do {
                 new_v = v_dis(globalGenerator);
@@ -255,7 +302,7 @@ pair<vector<uint>, double> Clonalg::getMinIndividualPopulation(void){
     min_individual.second = DBL_MAX;
 
     for(auto &idv : population){
-        if(idv.second < min_individual.second){ 
+        if(idv.second < min_individual.second){
             min_individual = idv;
         }
     }
@@ -278,5 +325,5 @@ void Clonalg::printResults(void){
         cout << " -> " << min_individual.first[i];
     }
     cout << endl;
-    cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << endl;    
+    cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << endl;
 }

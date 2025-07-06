@@ -4,10 +4,10 @@
 
 void Solve::solve(ifstream &input_file){
     const uint npop = 200;
-    const uint nclones = 100;
-    const uint ngen = 100;
+    const uint nclones = 150;
+    const uint ngen = 200;
     const uint d = 5;
-    const double beta = 2.0;
+    const double beta = 10.0;
     const double rho = 1.0;
 
     // Cria e lê o grafo
@@ -18,7 +18,7 @@ void Solve::solve(ifstream &input_file){
     Clonalg *clonalg = new Clonalg(graph, npop, nclones, ngen, d, beta,
                                    rho);
    
-    clonalg->createInitialPopulation();                                   
+    clonalg->createInitialPopulation(1);
 
     for(uint generation = 1; generation <= clonalg->getNgen(); ++generation){
         clonalg->evaluatePopulation();
@@ -37,10 +37,10 @@ void Solve::solve(ifstream &input_file){
 
 void Solve::generationsTest(ifstream &input_file, ofstream &output_file){
     const uint npop = 200;
-    const uint nclones = 100;
-    const uint ngen = 100;
+    const uint nclones = 150;
+    const uint ngen = 200;
     const uint d = 5;
-    const double beta = 2.0;
+    const double beta = 10.0;
     const double rho = 1.0;
 
     Graph *graph = new Graph();
@@ -57,7 +57,7 @@ void Solve::generationsTest(ifstream &input_file, ofstream &output_file){
 void Solve::factorialTest(ifstream &input_file, ofstream &output_file){
     const uint npop = 200; 
     array<uint, 3> nclones = {100, 150, 200};
-    const uint ngen = 100;
+    const uint ngen = 200;
     array<uint, 3> d = {2, 5, 10};
     array<double, 4> beta = {1.0, 2.0, 5.0, 10.0};
     array<double, 4> rho = {0.5, 1.0, 2.5, 5.0};
@@ -95,7 +95,7 @@ void Solve::solveGenerationsTest(const Graph *graph, const uint npop,
     BuildCSV *csv_builder = new BuildCSV();
     csv_builder->printGenIdfCSV(clonalg, output_file);
 
-    clonalg->createInitialPopulation();
+    clonalg->createInitialPopulation(1);
 
     for(uint generation = 1; generation <= clonalg->getNgen(); ++generation){
         clonalg->evaluatePopulation();
@@ -120,7 +120,7 @@ void Solve::solveFactorialTest(const Graph *graph, const uint npop,
     Clonalg *clonalg = new Clonalg(graph, npop, nclones, ngen, d, beta,
                                    rho);
     
-    clonalg->createInitialPopulation();
+    clonalg->createInitialPopulation(1);
 
     for(uint generation = 1; generation <= clonalg->getNgen(); ++generation){
         clonalg->evaluatePopulation();
